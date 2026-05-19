@@ -159,8 +159,8 @@ Future releases may include automated frontend and backend testing support.
 ```
 RIVETO/
 ├── backend/
-│   ├── controllers/
-│   ├── models/
+│   ├── controller/
+│   ├── model/
 │   ├── routes/
 │   ├── middleware/
 │   ├── services/
@@ -228,7 +228,7 @@ befor start contribution star the repo
 4. Push to the branch (`git push origin feature/YourFeature`)
 5. Open a Pull Request
 
-Please review [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+Please review [CONTRIBUTION.md](CONTRIBUTION.md) for details.
 
 ---
 
