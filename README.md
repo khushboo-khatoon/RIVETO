@@ -150,16 +150,8 @@ const handleUpload = async (event) => {
 
 ## 🧪 Testing
 
-```bash
-# Backend
-cd backend
-npm test
-
-# Frontend
-cd ../frontend
-npm test
-```
-
+Testing scripts are currently not configured for this project.
+Future releases may include automated frontend and backend testing support.
 ---
 
 ## 📂 Project Structure
