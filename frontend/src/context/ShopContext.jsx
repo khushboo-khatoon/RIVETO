@@ -9,11 +9,21 @@ export const shopDataContext = createContext();
 
 function ShopContext({ children }) {
   const [product, setProduct] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, total: 0, pages: 1 });
+  const [loadingProducts, setLoadingProducts] = useState(false);
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [cartItem, setCartItem] = useState({});
   const [compareList, setCompareList] = useState([]);
+  const [wishlistItem, setWishlistItem] = useState([]);
   const [comparePanelOpen, setComparePanelOpen] = useState(false);
+  const addToWishlist = (itemId) => {
+   setWishlistItem(prev =>
+     prev.includes(itemId)
+       ? prev.filter(id => id !== itemId)
+       : [...prev, itemId]
+    );
+  };
   const { serverUrl } = useContext(authDataContext);
   const { userData } = useContext(userDataContext); //
 
@@ -21,13 +31,20 @@ function ShopContext({ children }) {
   const delivery_fee = 40;
 
   // Fetch products from server
-  const getProducts = async () => {
+  const getProducts = async (page = 1, limit = 20) => {
+    if (loadingProducts) return;
+    setLoadingProducts(true);
     try {
-      const result = await axios.get(serverUrl + "/api/product/list");
-      console.log("Fetched products:", result.data);
-      setProduct(result.data);
+      const result = await axios.get(
+        `${serverUrl}/api/product/list?page=${page}&limit=${limit}`
+      );
+      const incoming = result.data.products || [];
+      setProduct(prev => page === 1 ? incoming : [...prev, ...incoming]);
+      setPagination(result.data.pagination || { page: 1, total: 0, pages: 1 });
     } catch (error) {
       console.log("Error fetching products:", error);
+    } finally {
+      setLoadingProducts(false);
     }
   };
 
@@ -119,19 +136,18 @@ function ShopContext({ children }) {
   const getCartAmount = () => {
     let totalAmount = 0;
     for (const items in cartItem) {
-      let itemInfo = product.find((product) => product._id === items);
+      let itemInfo = (product || []).find((p) => p._id === items);
       for (const item in cartItem[items]) {
         try {
-          if (cartItem[items][item] > 0) {
+          if (itemInfo && cartItem[items][item] > 0) {
             totalAmount += itemInfo.price * cartItem[items][item];
           }
         } catch (error) {
-
         }
       }
     }
-    return totalAmount
-  }
+    return totalAmount;
+  };
 
   const toggleCompare = (product) => {
     setCompareList(prev => {
@@ -179,6 +195,8 @@ function ShopContext({ children }) {
 
   const value = {
     product,
+    pagination,
+    loadingProducts,
     currency,
     delivery_fee,
     getProducts,
@@ -190,7 +208,7 @@ function ShopContext({ children }) {
     addtoCart,
     getCartCount,
     setCartItem, UpdateQuantity, getCartAmount,
-    compareList, toggleCompare, removeFromCompare, comparePanelOpen, toggleComparePanel
+    compareList, toggleCompare, removeFromCompare, comparePanelOpen, toggleComparePanel, wishlistItem, addToWishlist
   };
 
   return (

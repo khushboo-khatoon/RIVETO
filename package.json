@@ -17,10 +17,10 @@
       "prettier --write"
     ],
     "frontend/**/*.{js,jsx}": [
-      "npm exec --prefix frontend -- eslint --fix"
+      "npm --prefix frontend run lint:fix --"
     ],
     "backend/**/*.js": [
-      "npm exec --prefix backend -- eslint --fix"
+      "npm --prefix backend run lint:fix --"
     ]
   }
 }
