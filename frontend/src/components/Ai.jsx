@@ -135,7 +135,7 @@ function Ai() {
   ];
 
   return (
-    <div className="fixed bottom-6 right-6 z-40">
+    <div className="fixed bottom-28 md:bottom-6 right-5 z-40">
       {/* AI Assistant Robot */}
       <div
         className="relative cursor-pointer group"
