@@ -22,8 +22,5 @@
     "backend/**/*.js": [
       "npm --prefix backend run lint:fix --"
     ]
-  },
-  "dependencies": {
-    "env": "^0.0.2"
   }
 }
