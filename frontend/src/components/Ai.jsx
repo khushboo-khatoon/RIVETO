@@ -91,61 +91,7 @@ function Ai() {
         { text: transcript, sender: 'user', timestamp: new Date() },
       ]);
 
-      if (
-        transcript.includes('search') &&
-        transcript.includes('open') &&
-        !showSearch
-      ) {
-        speak('Opening search for you');
-        setShowSearch(true);
-        navigate('/collection');
-      } else if (
-        transcript.includes('search') &&
-        transcript.includes('close') &&
-        showSearch
-      ) {
-        speak('Closing search');
-        setShowSearch(false);
-      } else if (
-        transcript.includes('collection') ||
-        transcript.includes('products')
-      ) {
-        speak('Taking you to our collection page');
-        navigate('/collection');
-      } else if (transcript.includes('about')) {
-        speak("Here's our about page");
-        navigate('/about');
-        setShowSearch(false);
-      } else if (transcript.includes('home') || transcript.includes('main')) {
-        speak('Going to the home page');
-        navigate('/');
-        setShowSearch(false);
-      } else if (transcript.includes('cart') || transcript.includes('basket')) {
-        speak('Opening your shopping cart');
-        navigate('/cart');
-        setShowSearch(false);
-      } else if (
-        transcript.includes('contact') ||
-        transcript.includes('help')
-      ) {
-        speak('Taking you to our contact page');
-        navigate('/contact');
-        setShowSearch(false);
-      } else if (
-        transcript.includes('order') ||
-        transcript.includes('my orders')
-      ) {
-        speak('Showing your orders');
-        navigate('/order');
-        setShowSearch(false);
-      } else {
-        speak(
-          "I'm not sure how to help with that. Try asking about navigation, products, or your orders."
-        );
-        toast.info(
-          "Try saying: 'go to collection', 'open cart', or 'view orders'"
-        );
-      }
+      processTranscript(transcript);
     };
 
     recognition.onerror = (event) => {
@@ -162,46 +108,71 @@ function Ai() {
       setActiveAi(false);
     };
   };
-//handle text chat or command from input box
-  const handleTextcommand = () => { 
-    setChatMessages(prev => [...prev, { text: userChat, sender: 'user', timestamp: new Date() }]);
-
-    const transcript = (userChat || '').trim().toLowerCase();
-
-    if (transcript.includes("search") && transcript.includes("open") && !showSearch) {
-      speak("Opening search for you");
+  const processTranscript = (transcript) => {
+    if (
+      transcript.includes('search') &&
+      transcript.includes('open') &&
+      !showSearch
+    ) {
+      speak('Opening search for you');
       setShowSearch(true);
-      navigate("/collection");
-    } else if (transcript.includes("search") && transcript.includes("close") && showSearch) {
-      speak("Closing search");
+      navigate('/collection');
+    } else if (
+      transcript.includes('search') &&
+      transcript.includes('close') &&
+      showSearch
+    ) {
+      speak('Closing search');
       setShowSearch(false);
-    } else if (transcript.includes("collection") || transcript.includes("products")) {
-      speak("Taking you to our collection page");
-      navigate("/collection");
-    } else if (transcript.includes("about")) {
+    } else if (
+      transcript.includes('collection') ||
+      transcript.includes('products')
+    ) {
+      speak('Taking you to our collection page');
+      navigate('/collection');
+    } else if (transcript.includes('about')) {
       speak("Here's our about page");
-      navigate("/about");
+      navigate('/about');
       setShowSearch(false);
-    } else if (transcript.includes("home") || transcript.includes("main")) {
-      speak("Going to the home page");
-      navigate("/");
+    } else if (transcript.includes('home') || transcript.includes('main')) {
+      speak('Going to the home page');
+      navigate('/');
       setShowSearch(false);
-    } else if (transcript.includes("cart") || transcript.includes("basket")) {
-      speak("Opening your shopping cart");
-      navigate("/cart");
+    } else if (transcript.includes('cart') || transcript.includes('basket')) {
+      speak('Opening your shopping cart');
+      navigate('/cart');
       setShowSearch(false);
-    } else if (transcript.includes("contact") || transcript.includes("help")) {
-      speak("Taking you to our contact page");
-      navigate("/contact");
+    } else if (
+      transcript.includes('contact') ||
+      transcript.includes('help')
+    ) {
+      speak('Taking you to our contact page');
+      navigate('/contact');
       setShowSearch(false);
-    } else if (transcript.includes("order") || transcript.includes("my orders")) {
-      speak("Showing your orders");
-      navigate("/order");
+    } else if (
+      transcript.includes('order') ||
+      transcript.includes('my orders')
+    ) {
+      speak('Showing your orders');
+      navigate('/order');
       setShowSearch(false);
     } else {
-      speak("I'm not sure how to help with that. Try asking about navigation, products, or your orders.");
-      toast.info("Try saying: 'go to collection', 'open cart', or 'view orders'");
+      speak(
+        "I'm not sure how to help with that. Try asking about navigation, products, or your orders."
+      );
+      toast.info(
+        "Try saying: 'go to collection', 'open cart', or 'view orders'"
+      );
     }
+  };
+
+//handle text chat or command from input box
+  const handleTextcommand = () => { 
+    const transcript = (userChat || '').trim().toLowerCase();
+    if (!transcript) return;
+
+    setChatMessages(prev => [...prev, { text: userChat, sender: 'user', timestamp: new Date() }]);
+    processTranscript(transcript);
   }
 
   const handleRobotClick = () => {
@@ -217,12 +188,7 @@ function Ai() {
     setShowChat(false);
   };
 
-  const commonCommands = [
-    { command: 'Go to collection', description: 'Browse products' },
-    { command: 'Open cart', description: 'View your cart' },
-    { command: 'View orders', description: 'Check your orders' },
-    { command: 'About us', description: 'Learn about RIVETO' },
-  ];
+
 
   return (
     <div className="fixed bottom-28 md:bottom-6 right-5 z-40">
@@ -274,7 +240,7 @@ function Ai() {
           {/* Chat Messages */}
           <div
             ref={chatContainerRef}
-            className=" relative h-90 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-800"
+            className=" relative flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-800"
           >
             {chatMessages.length === 0 ? (
               <div className="text-center text-gray-500 my-8">
@@ -327,23 +293,31 @@ function Ai() {
               ))}
             </div> */}
             <input 
-            value={userChat}
-            onChange={(e)=> setUserchat(e.target.value)}
-               type = "text"
-               placeholder = {placeholders[index]}
-               className="placeholder:text-grey text-black border  border-grey mr-1 py-1 hover:bg-gray-400"
-                onKeyDown={(e)=>{
-              if(e.key === 'Enter'){
-                handleTextcommand(),
-              setUserchat('');
-              }
-            }}/>
-             {/*rnter button */}
-            <button onClick={()=>{
-              handleTextcommand(),
-              setUserchat('');
-            }}
-            className='bg-blue-500 rounded-xs p-1 mr-1'>enter</button> 
+              value={userChat}
+              onChange={(e)=> setUserchat(e.target.value)}
+              type="text"
+              aria-label="Chat input"
+              placeholder={placeholders[index]}
+              className="placeholder:text-gray-400 text-black border border-gray-300 rounded-sm px-2 mr-1 py-1 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onKeyDown={(e)=>{
+                if(e.key === 'Enter'){
+                  handleTextcommand();
+                  setUserchat('');
+                }
+              }}
+            />
+            {/*enter button */}
+            <button 
+              type="button"
+              aria-label="Send message"
+              onClick={()=>{
+                handleTextcommand();
+                setUserchat('');
+              }}
+              className='bg-blue-500 text-white rounded-sm p-1 px-2 mr-1 hover:bg-blue-600 transition-colors'
+            >
+              enter
+            </button> 
             <button // voice control
               onClick={handleVoiceCommand}
               disabled={isListening}
