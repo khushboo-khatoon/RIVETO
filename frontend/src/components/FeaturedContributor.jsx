@@ -1,5 +1,4 @@
 
-
 const FeaturedContributor = ({
   contributor,
   role,
