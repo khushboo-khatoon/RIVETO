@@ -5,6 +5,7 @@ import { userDataContext } from './context/UserContext';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { shopDataContext } from './context/ShopContext';
+import BackToTop from './components/BackToTop';
 
 function App() {
   const { userData } = useContext(userDataContext);
@@ -53,7 +54,7 @@ function App() {
             )
           }
         />
-        <Route path='/wishlist' element={<Wishlist />} />
+        <Route path="/wishlist" element={<Wishlist />} />
         <Route
           path="/about"
           element={
@@ -187,6 +188,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Ai />
+      <BackToTop />
 
       {/* Global Comparison Floating Button */}
       {compareList.length > 0 && !comparePanelOpen && (
