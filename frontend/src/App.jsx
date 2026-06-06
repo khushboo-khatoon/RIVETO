@@ -4,9 +4,13 @@ import { ToastContainer } from 'react-toastify';
 import { RiPriceTag3Line } from 'react-icons/ri';
 import './App.css';
 import 'react-toastify/dist/ReactToastify.css';
+import './App.css';
 
 import { userDataContext } from './context/UserContext';
 import { shopDataContext } from './context/ShopContext';
+
+// Components
+import Nav from './components/Nav';
 import BackToTop from './components/BackToTop';
 import Nav from './components/Nav';
 import Login from './pages/Login';
