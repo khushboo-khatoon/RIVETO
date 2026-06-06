@@ -179,14 +179,11 @@ function Login() {
     try {
       const response = await signInWithPopup(auth, provider);
       const user = response.user;
-      await apiConfig.post(
-        '/auth/googlelogin',
-        {
-          name: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-        }
-      );
+      await apiConfig.post('/auth/googlelogin', {
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+      });
 
       toast.success('🎉 Google login successful!');
       setTimeout(() => {
@@ -220,6 +217,7 @@ function Login() {
         );
       }
 
+      // eslint-disable-next-line no-console
       console.error('Google login error:', err);
     } finally {
       setGoogleLoading(false);

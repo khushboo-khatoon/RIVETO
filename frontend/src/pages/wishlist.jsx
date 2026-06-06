@@ -4,17 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { FaHeart, FaTrash } from 'react-icons/fa';
 
 function Wishlist() {
-  const {
-    wishlist,
-    fetchWishlist,
-    currency,
-    removeFromWishlist,
-  } = useContext(shopDataContext);
+  const { wishlist, fetchWishlist, currency, removeFromWishlist } =
+    useContext(shopDataContext);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchWishlist();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleRemove = (e, id) => {
@@ -24,7 +21,6 @@ function Wishlist() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0B1120] pt-28 px-4 md:px-10">
-
       {/* Heading */}
       <div className="flex items-center gap-3 mb-8">
         <FaHeart className="text-rose-500 text-3xl" />
@@ -55,14 +51,12 @@ function Wishlist() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
           {wishlist.map((item) => (
             <div
               key={item._id}
               onClick={() => navigate(`/productdetail/${item._id}`)}
               className="relative bg-white dark:bg-[#121826] rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer group"
             >
-
               {/* REMOVE BUTTON */}
               <button
                 onClick={(e) => handleRemove(e, item._id)}
@@ -91,13 +85,13 @@ function Wishlist() {
 
               {/* DETAILS */}
               <div className="p-4">
-
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2 min-h-[56px]">
                   {item.name}
                 </h2>
 
                 <p className="mt-3 text-2xl font-bold text-blue-600">
-                  {currency}{item.price}
+                  {currency}
+                  {item.price}
                 </p>
 
                 <button
@@ -109,11 +103,9 @@ function Wishlist() {
                 >
                   View Product
                 </button>
-
               </div>
             </div>
           ))}
-
         </div>
       )}
     </div>

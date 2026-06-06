@@ -58,6 +58,7 @@ function LatestCollection() {
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       videoRef.current.requestFullscreen().catch((err) => {
+        // eslint-disable-next-line no-console
         console.error(`Error attempting to enable fullscreen: ${err.message}`);
       });
       setIsFullscreen(true);

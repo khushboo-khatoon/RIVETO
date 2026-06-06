@@ -1,7 +1,15 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 import { shopDataContext } from '../context/ShopContext';
 import apiConfig from '../utils/apiConfig';
-import { FaBox, FaShoppingBag, FaShippingFast, FaCheckCircle, FaClock, FaMapMarkerAlt, FaUndo } from 'react-icons/fa';
+import {
+  FaBox,
+  FaShoppingBag,
+  FaShippingFast,
+  FaCheckCircle,
+  FaClock,
+  FaMapMarkerAlt,
+  FaUndo,
+} from 'react-icons/fa';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { FaCalendarAlt, FaMoneyBillWave, FaStar } from 'react-icons/fa';
@@ -39,7 +47,8 @@ function Order() {
         setOrderData(allOrdersItem.reverse());
       }
     } catch (error) {
-      console.log('Error loading orders:', error);
+      // eslint-disable-next-line no-console
+      console.error('Error loading orders:', error);
     } finally {
       setIsLoading(false);
     }
