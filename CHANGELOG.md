@@ -1,11 +1,24 @@
 # Changelog
 
-## v1.1.0
+## [1.1.0] - 2026-06-06
 
+### Added
 - Enterprise UI system overhaul
-- Updated PDP, Home, Collection pages
-- Improved layout and UI consistency
+- Improved layout consistency across the app
 
-## v1.0.0
+### Changed
+- Updated Product Detail Page (PDP)
+- Updated Home page design
+- Updated Collection page layout
+- Improved overall UI consistency and responsiveness
 
+### Fixed
+- Google login issue resolved (normalized backend URL and added debug logs)
+
+---
+
+## [1.0.0] - 2026-06-06
+
+### Added
 - Initial release of RIVETO
+- Basic core application structure
