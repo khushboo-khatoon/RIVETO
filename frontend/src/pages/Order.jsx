@@ -1,6 +1,18 @@
 import { useContext, useEffect, useState, useRef } from 'react';
 import { shopDataContext } from '../context/ShopContext';
 import apiConfig from '../utils/apiConfig';
+import {
+  FaBox,
+  FaShoppingBag,
+  FaShippingFast,
+  FaCheckCircle,
+  FaClock,
+  FaMapMarkerAlt,
+  FaUndo,
+} from 'react-icons/fa';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { FaCalendarAlt, FaMoneyBillWave, FaStar } from 'react-icons/fa';
 import { FaBox, FaShoppingBag, FaShippingFast, FaCheckCircle, FaClock, FaMapMarkerAlt, FaUndo, FaCalendarAlt, FaMoneyBillWave, FaStar } from 'react-icons/fa';
 import { GiReceiveMoney } from 'react-icons/gi';
 import Title from '../components/Title';
@@ -41,6 +53,8 @@ function Order() {
         setOrderData(allOrdersItem.reverse());
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error loading orders:', error);
       console.log('Error loading orders:', error);
       setError(error.response?.data?.message || error.message || 'Failed to load orders.');
     } finally {
