@@ -32,7 +32,7 @@ const useGitHubContributors = (
         );
 
         // Fetch PR count (simplified, just the first page is usually enough for a counter or estimate)
-        const prRes = await axios.get(
+        const _prRes = await axios.get(
           `https://api.github.com/repos/${repoOwner}/${repoName}/pulls?state=all&per_page=1`
         );
         // Use Link header or just a placeholder if not easily parsed.
@@ -51,6 +51,7 @@ const useGitHubContributors = (
 
         setError(null);
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error('Error fetching GitHub data:', err);
         setError('Failed to load contributor data. Please try again later.');
       } finally {

@@ -6,8 +6,9 @@ import { sendMail } from "../config/sendEmail.js";
 import generateOTP from "../utils/otp.js";
 import TempUser from "../model/tempUserModel.js";
 import { otpTemplate } from "../utils/otpTemplet.js";
+import { sendNotification } from "../services/notificationService.js";
 
-export const registration = async (req, res) => {
+export const sendOTP = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
@@ -29,25 +30,35 @@ export const registration = async (req, res) => {
     await TempUser.findOneAndDelete({ email });
 
     const otp = generateOTP();
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const hashPassword = await bcrypt.hash(password, 10);
-
+    // save temp user
     await TempUser.create({
       name,
       email,
-      password: hashPassword,
+      password: hashedPassword,
       otp,
       otpExpire: new Date(Date.now() + 5 * 60 * 1000),
     });
+    try {
+      await sendMail(email, otpTemplate(otp));
+    } catch (_error) {
+      await TempUser.deleteOne({ email });
 
-    await sendMail(email, otpTemplate(otp));
+      return res.status(500).json({
+        success: false,
+        message: "Failed to send OTP email",
+      });
+    }
+
 
     return res.status(200).json({
-      message: "OTP sent to email",
+      success: true,
+      message: "OTP sent successfully",
     });
-  } catch (error) {
-    console.log("registration error:", error);
-    return res.status(500).json({ message: `registration error: ${error}` });
+  } catch (_error) {
+    console.log("registration error:", _error);
+    return res.status(500).json({ message: `registration error: ${_error}` });
   }
 };
 
@@ -77,6 +88,13 @@ export const verifyOTP = async (req, res) => {
 
     await TempUser.deleteOne({ email });
 
+    sendNotification({
+      isAdmin: true,
+      title: "New User Registered",
+      message: `${user.name} (${user.email}) has signed up.`,
+      type: "new_user",
+    });
+
     const token = genToken(user._id);
 
     res.cookie("token", token, {
@@ -87,11 +105,12 @@ export const verifyOTP = async (req, res) => {
     });
 
     return res.status(201).json({
+      success: true,
       message: "User verified and created",
       user,
     });
-  } catch (error) {
-    console.log("verifyOTP error:", error);
+  } catch (_error) {
+    console.log("verifyOTP error:", _error);
     return res.status(500).json({ message: "OTP verification failed" });
   }
 };
@@ -104,8 +123,7 @@ export const login = async (req, res) => {
     if (!user) return res.status(400).json({ message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     const token = genToken(user._id);
     res.cookie("token", token, {
@@ -116,9 +134,9 @@ export const login = async (req, res) => {
     });
 
     return res.status(200).json(user);
-  } catch (error) {
-    console.log("login error:", error);
-    return res.status(500).json({ message: `login error: ${error}` });
+  } catch (_error) {
+    console.log("login error:", _error);
+    return res.status(500).json({ message: `login error: ${_error}` });
   }
 };
 
@@ -128,9 +146,7 @@ export const googleLogin = async (req, res) => {
 
     let user = await User.findOne({ email });
     if (!user) {
-      const randomPassword = Math.random().toString(36).slice(-12);
-      const hashed = await bcrypt.hash(randomPassword, 10);
-      user = await User.create({ name, email, password: hashed });
+      user = await User.create({ name, email });
     }
 
     const token = genToken(user._id);
@@ -142,9 +158,9 @@ export const googleLogin = async (req, res) => {
     });
 
     return res.status(200).json(user);
-  } catch (error) {
-    console.log("google login error:", error);
-    return res.status(500).json({ message: `google login error: ${error}` });
+  } catch (_error) {
+    console.log("google login error:", _error);
+    return res.status(500).json({ message: `google login error: ${_error}` });
   }
 };
 
@@ -157,9 +173,9 @@ export const logOut = async (req, res) => {
       maxAge: 0,
     });
     return res.status(200).json({ message: "Logged out successfully" });
-  } catch (error) {
-    console.log("logout error:", error);
-    return res.status(500).json({ message: `logout error: ${error}` });
+  } catch (_error) {
+    console.log("logout error:", _error);
+    return res.status(500).json({ message: `logout error: ${_error}` });
   }
 };
 
@@ -180,8 +196,8 @@ export const adminLogin = async (req, res) => {
       return res.status(200).json(token);
     }
     return res.status(400).json({ message: "Invalid admin credentials" });
-  } catch (error) {
-    console.log("admin login error:", error);
-    return res.status(500).json({ message: `admin login error: ${error}` });
+  } catch (_error) {
+    console.log("admin login error:", _error);
+    return res.status(500).json({ message: `admin login error: ${_error}` });
   }
 };

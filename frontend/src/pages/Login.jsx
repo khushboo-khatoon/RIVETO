@@ -1,16 +1,15 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IoEyeOutline, IoEye, IoMail, IoLockClosed } from 'react-icons/io5';
-import { FcGoogle } from 'react-icons/fc';
-import axios from 'axios';
+import apiConfig from '../utils/apiConfig';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../utils/Firebase';
-import { authDataContext } from '../context/AuthContext';
 import { userDataContext } from '../context/UserContext';
 import { shopDataContext } from '../context/ShopContext';
 import { toast } from 'react-toastify';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { FcGoogle } from 'react-icons/fc';
+import { IoMail, IoLockClosed, IoEye, IoEyeOutline } from 'react-icons/io5';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,7 +25,6 @@ function Login() {
   const [preload, setPreload] = useState(true);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  const { serverUrl } = useContext(authDataContext);
   const { getCurrentUser } = useContext(userDataContext);
   const { product } = useContext(shopDataContext);
   const navigate = useNavigate();
@@ -162,20 +160,15 @@ function Login() {
 
     setLoading(true);
     try {
-      await axios.post(`${serverUrl}/api/auth/login`, formData, {
-        withCredentials: true,
-      });
+      await apiConfig.post('/auth/login', formData);
 
       toast.success('🎉 Login successful! Welcome back to Riveto');
       setTimeout(() => {
         getCurrentUser();
         navigate('/');
       }, 500);
-    } catch (err) {
-      const errorMessage =
-        err?.response?.data?.message ||
-        'Login failed. Please check your credentials.';
-      toast.error(errorMessage);
+    } catch {
+      // API errors are shown by the global interceptor.
     } finally {
       setLoading(false);
     }
@@ -186,27 +179,11 @@ function Login() {
     try {
       const response = await signInWithPopup(auth, provider);
       const user = response.user;
-      console.log('Debug: serverUrl for googleLogin =', serverUrl);
-      // expose the exact request URL for debugging in the browser
-      try {
-        window.__lastGoogleServerUrl = serverUrl;
-        window.__lastGoogleRequest = `${serverUrl}/api/auth/googlelogin`;
-        console.log(
-          'Debug: googleLogin request URL =',
-          window.__lastGoogleRequest
-        );
-      } catch (e) {
-        /* ignore in non-browser environments */
-      }
-      await axios.post(
-        `${serverUrl}/api/auth/googlelogin`,
-        {
-          name: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-        },
-        { withCredentials: true }
-      );
+      await apiConfig.post('/auth/googlelogin', {
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+      });
 
       toast.success('🎉 Google login successful!');
       setTimeout(() => {
@@ -232,18 +209,15 @@ function Login() {
         toast.error(
           '🚫 This account has been disabled. Please contact support.'
         );
-      } else if (err?.response?.status === 500) {
-        toast.error(
-          '🔧 Server error during Google login. Please try again later.'
-        );
-      } else if (err?.response?.data?.message) {
-        toast.error(err.response.data.message);
+      } else if (err?.response) {
+        // API errors are shown by the global interceptor.
       } else {
         toast.error(
           'Google login failed. Please try again or use email instead.'
         );
       }
 
+      // eslint-disable-next-line no-console
       console.error('Google login error:', err);
     } finally {
       setGoogleLoading(false);

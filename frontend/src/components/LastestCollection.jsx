@@ -1,12 +1,12 @@
-import React, { useContext, useState, useRef, useEffect } from 'react';
+import { useContext, useState, useRef, useEffect } from 'react';
 import { shopDataContext } from '../context/ShopContext';
 import { useNavigate } from 'react-router-dom';
-import Card from './Card';
-import Title from './Title';
+
 import mobvid from '../assets/4 Mobile.mp4';
-import { FaPlay, FaPause, FaExpand, FaCompress } from 'react-icons/fa';
 
 import gsap from 'gsap';
+import { FaCompress, FaExpand, FaPause, FaPlay } from 'react-icons/fa';
+import Card from '../components/Card';
 
 function LatestCollection() {
   const { product, compareList, toggleCompare } = useContext(shopDataContext);
@@ -58,6 +58,7 @@ function LatestCollection() {
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       videoRef.current.requestFullscreen().catch((err) => {
+        // eslint-disable-next-line no-console
         console.error(`Error attempting to enable fullscreen: ${err.message}`);
       });
       setIsFullscreen(true);

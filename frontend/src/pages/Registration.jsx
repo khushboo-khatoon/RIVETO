@@ -1,20 +1,20 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  IoEyeOutline,
-  IoEye,
-  IoLockClosed,
-  IoMail,
-  IoPerson,
-} from 'react-icons/io5';
-import { FcGoogle } from 'react-icons/fc';
-import { authDataContext } from '../context/AuthContext';
-import axios from 'axios';
+import { useState, useContext, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+
+import apiConfig from '../utils/apiConfig';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, provider } from '../../utils/Firebase';
 import { userDataContext } from '../context/UserContext';
 import gsap from 'gsap';
 import { toast } from 'react-toastify';
+import { FcGoogle } from 'react-icons/fc';
+import {
+  IoEye,
+  IoEyeOutline,
+  IoLockClosed,
+  IoMail,
+  IoPerson,
+} from 'react-icons/io5';
 
 function Registration() {
   const [show, setShow] = useState(false);
@@ -23,7 +23,6 @@ function Registration() {
   const [otp, setOtp] = useState('');
   const [otpLoading, setOtpLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const { serverUrl } = useContext(authDataContext);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -78,8 +77,8 @@ function Registration() {
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
     }
 
     setErrors(newErrors);
@@ -104,24 +103,17 @@ function Registration() {
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
-    try {
-      await axios.post(`${serverUrl}/api/auth/registration`, formData, {
-        withCredentials: true,
-      });
 
-      toast.success('OTP send successfully 🎉');
+    try {
+      await apiConfig.post('/auth/send-otp', formData);
+
+      toast.success('OTP sent successfully 🎉');
       setStep('2');
-    } catch (error) {
-      console.error('Registration failed:', error);
-      const errorMessage =
-        error.response?.data?.message ||
-        'Registration failed. Please try again.';
-      toast.error(errorMessage);
+    } catch {
+      // API errors are shown by the global interceptor.
     } finally {
       setLoading(false);
     }
@@ -131,23 +123,16 @@ function Registration() {
     setOtpLoading(true);
 
     try {
-      await axios.post(
-        `${serverUrl}/api/auth/verify-otp`,
-        {
-          email: formData.email,
-          otp,
-        },
-        { withCredentials: true }
-      );
+      await apiConfig.post('/auth/verify-otp', {
+        email: formData.email,
+        otp,
+      });
 
       toast.success('Account verified successfully 🎉');
-
       getCurrentUser();
       navigate('/');
-    } catch (error) {
-      console.error(error);
-      const msg = error.response?.data?.message || 'OTP verification failed';
-      toast.error(msg);
+    } catch {
+      // API errors are shown by the global interceptor.
     } finally {
       setOtpLoading(false);
     }
@@ -159,22 +144,21 @@ function Registration() {
       const response = await signInWithPopup(auth, provider);
       const user = response.user;
 
-      await axios.post(
-        serverUrl + '/api/auth/googlelogin',
-        {
-          name: user.displayName,
-          email: user.email,
-          photoURL: user.photoURL,
-        },
-        { withCredentials: true }
-      );
+      await apiConfig.post('/auth/googlelogin', {
+        name: user.displayName,
+        email: user.email,
+        photoURL: user.photoURL,
+      });
 
       getCurrentUser();
       toast.success('Welcome to Riveto! 🎉');
       navigate('/');
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Google Signup Error:', error);
-      toast.error('Google signup failed. Please try again.');
+      if (!error.response) {
+        toast.error('Google signup failed. Please try again.');
+      }
     } finally {
       setGoogleLoading(false);
     }
@@ -325,19 +309,19 @@ function Registration() {
                   />
                   <label htmlFor="terms" className="text-gray-300 text-sm">
                     I agree to the{' '}
-                    <button
-                      type="button"
-                      className="text-cyan-400 hover:underline"
+                    <Link
+                      to="/terms"
+                      className="text-cyan-400 hover:underline focus:outline-none focus:ring-1 focus:ring-cyan-400 rounded"
                     >
                       Terms of Service
-                    </button>{' '}
+                    </Link>{' '}
                     and{' '}
-                    <button
-                      type="button"
-                      className="text-cyan-400 hover:underline"
+                    <Link
+                      to="/privacy"
+                      className="text-cyan-400 hover:underline focus:outline-none focus:ring-1 focus:ring-cyan-400 rounded"
                     >
                       Privacy Policy
-                    </button>
+                    </Link>
                   </label>
                 </div>
 

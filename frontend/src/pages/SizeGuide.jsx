@@ -1,20 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { FaChevronDown, FaChevronUp, FaChild, FaExchangeAlt, FaFemale, FaHandPointRight, FaInfoCircle, FaMale, FaRulerHorizontal, FaRulerVertical, FaShoePrints, FaTshirt } from 'react-icons/fa';
+import { GiNecklaceDisplay, GiTrousers } from 'react-icons/gi';
 import Footer from '../components/Footer';
-import {
-  FaRulerHorizontal,
-  FaRulerVertical,
-  FaTshirt,
-  FaShoePrints,
-  FaMale,
-  FaFemale,
-  FaChild,
-  FaExchangeAlt,
-  FaInfoCircle,
-  FaChevronDown,
-  FaChevronUp,
-  FaHandPointRight,
-} from 'react-icons/fa';
-import { GiTrousers, GiNecklaceDisplay } from 'react-icons/gi';
+
 
 /* ─── Size Data ─── */
 
@@ -330,7 +318,7 @@ function SizeTable({ chart }) {
 
 /* ─── Collapsible Measurement Tip ─── */
 
-function MeasurementTipCard({ tip }) {
+export function MeasurementTipCard({ tip }) {
   const [open, setOpen] = useState(false);
 
   return (

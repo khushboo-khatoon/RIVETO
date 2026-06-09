@@ -1,19 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { FaArrowRight, FaCheckCircle, FaCopyright, FaEdit, FaEnvelope, FaExclamationTriangle, FaFileContract, FaGithub, FaLock, FaMoneyBillWave, FaShieldAlt, FaUserCheck } from 'react-icons/fa';
 import Footer from '../components/Footer';
-import {
-  FaShieldAlt,
-  FaUserCheck,
-  FaLock,
-  FaMoneyBillWave,
-  FaCopyright,
-  FaExclamationTriangle,
-  FaEdit,
-  FaEnvelope,
-  FaGithub,
-  FaCheckCircle,
-  FaArrowRight,
-  FaFileContract,
-} from 'react-icons/fa';
+
 
 const sections = [
   {
@@ -205,7 +193,7 @@ const TableOfContents = ({ activeSection, onSectionClick }) => (
       Quick Navigation
     </h3>
     <nav className="space-y-2">
-      {sections.map((section, index) => (
+      {sections.map((section, _index) => (
         <button
           key={section.id}
           onClick={() => onSectionClick(section.id)}

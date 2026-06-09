@@ -1,17 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { FaArrowRight, FaChartLine, FaCheckCircle, FaCog, FaCookie, FaExclamationTriangle, FaInfoCircle, FaLock, FaShieldAlt, FaUserCog } from 'react-icons/fa';
 import Footer from '../components/Footer';
-import {
-  FaCookie,
-  FaShieldAlt,
-  FaCog,
-  FaUserCog,
-  FaCheckCircle,
-  FaArrowRight,
-  FaInfoCircle,
-  FaChartLine,
-  FaLock,
-  FaExclamationTriangle,
-} from 'react-icons/fa';
+
 
 const sections = [
   {
@@ -494,7 +484,7 @@ const CookiePolicy = () => {
                   <FaArrowRight />
                 </a>
                 <a
-                  href="/privicypolicy"
+                  href="/privacypolicy"
                   className="px-6 py-3 bg-gray-700 text-white rounded-lg font-semibold hover:bg-gray-600 transition-all duration-300 flex items-center gap-2"
                 >
                   <FaLock />

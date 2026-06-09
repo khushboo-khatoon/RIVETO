@@ -1,37 +1,42 @@
-import React, { useContext } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { useContext } from 'react';
+import { useLocation, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import { RiPriceTag3Line } from 'react-icons/ri';
 import './App.css';
+import 'react-toastify/dist/ReactToastify.css';
+
+import { userDataContext } from './context/UserContext';
+import { shopDataContext } from './context/ShopContext';
+
+// Components
+import Nav from './components/Nav';
+import BackToTop from './components/BackToTop';
+import Login from './pages/Login';
 import Registration from './pages/Registration';
 import Home from './pages/Home';
-import Login from './pages/Login';
-import Nav from './components/Nav';
-import { userDataContext } from './context/UserContext';
 import About from './pages/About';
+import Wishlist from './pages/wishlist';
 import Collections from './pages/Collections';
+import NewArrivals from './pages/NewArrivals';
+import BestSellers from './pages/BestSellers';
+import Recommendations from './pages/Recommendations';
 import Product from './pages/Product';
 import Contact from './pages/Contact';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import PlaceOrder from './pages/PlaceOrder';
-import Order from './pages/Order';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import NotFound from './pages/NotFound';
-import Ai from './components/Ai';
 import FaqPage from './pages/FaqPage';
-import Wishlist from './pages/wishlist'
-
-import PrivicyPolicy from './pages/PrivicyPolicy';
+import Order from './pages/Order';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndServices from './pages/TermsAndServices';
 import SizeGuide from './pages/SizeGuide';
 import CookiePolicy from './pages/CookiePolicy';
 import Contributors from './pages/Contributors';
-import NewArrivals from './pages/NewArrivals';
-import BestSellers from './pages/BestSellers';
-import Recommendations from './pages/Recommendations';
-import { shopDataContext } from './context/ShopContext';
+import Notifications from './pages/Notifications';
+import NotFound from './pages/NotFound';
+import LandingPage from './pages/LandingPage';
+import Ai from './components/Ai';
 import ComparisonPanel from './components/ComparisonPanel';
-import { RiPriceTag3Line } from 'react-icons/ri';
 
 function App() {
   const { userData } = useContext(userDataContext);
@@ -42,7 +47,7 @@ function App() {
     removeFromCompare,
   } = useContext(shopDataContext);
   const location = useLocation();
-  const hideNavRoutes = ['/login', '/signup'];
+  const hideNavRoutes = ['/login', '/signup', '/'];
   const shouldShowNav = !hideNavRoutes.includes(location.pathname);
 
   return (
@@ -55,32 +60,52 @@ function App() {
         <Route
           path="/login"
           element={
-            userData ? <Navigate to={location.state?.from || '/'} /> : <Login />
+            userData ? (
+              <Navigate to={location.state?.from || '/home'} />
+            ) : (
+              <Login />
+            )
           }
         />
         <Route
           path="/signup"
           element={
             userData ? (
-              <Navigate to={location.state?.from || '/'} />
+              <Navigate to={location.state?.from || '/home'} />
             ) : (
               <Registration />
             )
           }
         />
 
-        {/* Protected Routes */}
+        {/* Public landing page — no auth required */}
         <Route
           path="/"
+          element={userData ? <Navigate to="/home" replace /> : <LandingPage />}
+        />
+
+        {/* Protected Routes */}
+        <Route
+          path="/home"
           element={
             userData ? (
               <Home />
+            ) : (
+              <Navigate to="/login" state={{ from: '/home' }} />
+            )
+          }
+        />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route
+          path="/notifications"
+          element={
+            userData ? (
+              <Notifications />
             ) : (
               <Navigate to="/login" state={{ from: location.pathname }} />
             )
           }
         />
-        <Route path='/wishlist' element={<Wishlist />} />
         <Route
           path="/about"
           element={
@@ -205,7 +230,9 @@ function App() {
         />
 
         {/* Public routes - Legal pages should be accessible without login */}
-        <Route path="/privicypolicy" element={<PrivicyPolicy />} />
+        <Route path="/privacypolicy" element={<PrivacyPolicy />} />
+        <Route path="/privicypolicy" element={<Navigate to="/privacypolicy" replace />} />
+        <Route path="/terms" element={<TermsAndServices />} />
         <Route path="/termsandservices" element={<TermsAndServices />} />
         <Route path="/size-guide" element={<SizeGuide />} />
         <Route path="/cookie-policy" element={<CookiePolicy />} />
@@ -214,6 +241,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Ai />
+      <BackToTop />
 
       {/* Global Comparison Floating Button */}
       {compareList.length > 0 && !comparePanelOpen && (

@@ -1,24 +1,11 @@
-import React, {
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-} from 'react';
+import { useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { useFocusTrap, useEscapeKey } from '../hooks/useDialogA11y';
-import {
-  FaChevronRight,
-  FaChevronDown,
-  FaFilter,
-  FaTimes,
-  FaSearch,
-  FaStar,
-} from 'react-icons/fa';
-import { RiPriceTag3Line, RiArrowUpDownLine } from 'react-icons/ri';
-import { toast } from 'react-toastify';
 import { shopDataContext } from '../context/ShopContext';
 import Card from '../components/Card';
 import Footer from '../components/Footer';
+import { RiPriceTag3Line, RiArrowUpDownLine } from 'react-icons/ri';
+import { FaStar, FaSearch, FaFilter, FaTimes } from 'react-icons/fa';
+import { LoadingState, EmptyState, ErrorState } from '../components/StateComponents';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -46,42 +33,6 @@ const slideAnimationStyle = `
     scrollbar-width: none;
   }
 `;
-
-// Loader Component
-const Loader = () => {
-  return (
-    <div className="flex flex-col items-center justify-center py-20">
-      <div className="relative w-16 h-16 mb-4">
-        <div className="absolute inset-0 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
-        <div className="absolute inset-2 border-4 border-cyan-300 border-b-transparent rounded-full animate-spin-reverse"></div>
-      </div>
-      <p className="text-cyan-700 dark:text-cyan-200 text-lg font-medium">
-        Loading Products...
-      </p>
-      <p className="text-slate-500 dark:text-gray-400 text-sm mt-2">
-        Discovering amazing items for you
-      </p>
-    </div>
-  );
-};
-
-// Skeleton Loader for Cards
-const CardSkeleton = () => {
-  return (
-    <div className="bg-gradient-to-br from-slate-100 to-white dark:from-gray-800 dark:to-gray-900 rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-gray-700 animate-pulse">
-      <div className="w-full h-64 bg-slate-200 dark:bg-gray-700"></div>
-      <div className="p-5 space-y-3">
-        <div className="h-4 bg-slate-200 dark:bg-gray-700 rounded"></div>
-        <div className="h-4 bg-slate-200 dark:bg-gray-700 rounded w-3/4"></div>
-        <div className="flex justify-between items-center pt-2">
-          <div className="h-6 bg-slate-200 dark:bg-gray-700 rounded w-1/3"></div>
-          <div className="h-10 bg-slate-200 dark:bg-gray-700 rounded w-1/2"></div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // Filter Content Component
 const FilterContent = ({
   activeFilters,
@@ -239,6 +190,7 @@ function Collections() {
     product,
     pagination,
     loadingProducts,
+    productsError,
     getProducts,
     search,
     showSearch,
@@ -253,7 +205,6 @@ function Collections() {
   const [selectedRatings, setSelectedRatings] = useState([]);
   const [activeFilters, setActiveFilters] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [isFiltering, setIsFiltering] = useState(false);
 
   const contentRef = useRef(null);
   const filterRef = useRef(null);
@@ -297,66 +248,51 @@ function Collections() {
     }
   };
 
-  const applyFilter = () => {
-    setIsFiltering(true);
+  const applyFilter = useCallback(() => {
+    let productCopy = product.slice();
 
-    // Simulate filtering delay for better UX
-    setTimeout(() => {
-      let productCopy = product.slice();
-
-      // Search filter
-      if (showSearch && search) {
-        productCopy = productCopy.filter((item) =>
-          item.name.toLowerCase().includes(search.toLowerCase())
-        );
-      }
-
-      // Category filter
-      if (category.length > 0) {
-        productCopy = productCopy.filter((item) =>
-          category.includes(item.category)
-        );
-      }
-
-      // Subcategory filter
-      if (subCategory.length > 0) {
-        productCopy = productCopy.filter((item) =>
-          subCategory.includes(item.subCategory)
-        );
-      }
-
-      // Price filter
-      productCopy = productCopy.filter(
-        (item) => item.price >= priceRange[0] && item.price <= priceRange[1]
+    if (showSearch && search) {
+      productCopy = productCopy.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase())
       );
+    }
 
-      // Rating filter (simulated)
-      if (selectedRatings.length > 0) {
-        productCopy = productCopy.filter((item) => {
-          const itemRating = Math.floor(Math.random() * 1.5 + 3.5); // Simulated rating
-          return selectedRatings.some((rating) => itemRating >= rating);
-        });
-      }
+    if (category.length > 0) {
+      productCopy = productCopy.filter((item) =>
+        category.includes(item.category)
+      );
+    }
 
-      setFilterProduct(productCopy);
+    if (subCategory.length > 0) {
+      productCopy = productCopy.filter((item) =>
+        subCategory.includes(item.subCategory)
+      );
+    }
 
-      // Count active filters
-      const filterCount =
-        category.length +
-        subCategory.length +
-        selectedRatings.length +
-        (priceRange[0] > 0 || priceRange[1] < 2000 ? 1 : 0);
-      setActiveFilters(filterCount);
+    productCopy = productCopy.filter(
+      (item) => item.price >= priceRange[0] && item.price <= priceRange[1]
+    );
 
-      setIsFiltering(false);
-    }, 500);
-  };
+    if (selectedRatings.length > 0) {
+      productCopy = productCopy.filter((item) => {
+        const itemRating = item.rating || 0;
+        return selectedRatings.some((rating) => itemRating >= rating);
+      });
+    }
 
-  const sortProduct = () => {
-    setIsFiltering(true);
+    setFilterProduct(productCopy);
 
-    setTimeout(() => {
-      let sorted = [...filterProduct];
+    const filterCount =
+      category.length +
+      subCategory.length +
+      selectedRatings.length +
+      (priceRange[0] > 0 || priceRange[1] < 2000 ? 1 : 0);
+    setActiveFilters(filterCount);
+  }, [product, showSearch, search, category, subCategory, priceRange, selectedRatings]);
+
+  const sortProduct = useCallback(() => {
+    setFilterProduct((prev) => {
+      let sorted = [...prev];
       switch (sortType) {
         case 'low-high':
           sorted.sort((a, b) => a.price - b.price);
@@ -365,28 +301,21 @@ function Collections() {
           sorted.sort((a, b) => b.price - a.price);
           break;
         case 'rating':
-          sorted.sort((a, b) => (b.rating || 4.5) - (a.rating || 4.5));
+          sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
           break;
         default:
-          // Relevant sorting (default)
           break;
       }
-      setFilterProduct(sorted);
-      setIsFiltering(false);
-    }, 300);
-  };
+      return sorted;
+    });
+  }, [sortType]);
 
   const clearAllFilters = () => {
-    setIsFiltering(true);
-
-    setTimeout(() => {
-      setCategory([]);
-      setSubCategory([]);
-      setSelectedRatings([]);
-      setPriceRange([0, 2000]);
-      setSortType('relevant');
-      setIsFiltering(false);
-    }, 500);
+    setCategory([]);
+    setSubCategory([]);
+    setSelectedRatings([]);
+    setPriceRange([0, 2000]);
+    setSortType('relevant');
   };
 
   // Inject style element on mount
@@ -414,15 +343,15 @@ function Collections() {
 
   useEffect(() => {
     sortProduct();
-  }, [sortType]);
+  }, [sortType, sortProduct]);
 
   useEffect(() => {
     applyFilter();
-  }, [category, subCategory, search, showSearch, priceRange, selectedRatings]);
+  }, [category, subCategory, search, showSearch, priceRange, selectedRatings, applyFilter]);
 
   useEffect(() => {
     // Animations
-    if (!isLoading && !isFiltering) {
+    if (!isLoading) {
       gsap.fromTo(
         '.collection-item',
         { opacity: 0, y: 30 },
@@ -451,7 +380,7 @@ function Collections() {
         }
       );
     }
-  }, [filterProduct, isLoading, isFiltering]);
+  }, [filterProduct, isLoading]);
 
   return (
     <>
@@ -537,22 +466,14 @@ function Collections() {
             </div>
 
             {/* Product Grid */}
-            {isLoading ? (
-              <div className="space-y-8">
-                <Loader />
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                  {[...Array(8)].map((_, index) => (
-                    <CardSkeleton key={index} />
-                  ))}
-                </div>
-              </div>
-            ) : isFiltering ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <div className="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                <p className="text-cyan-700 dark:text-cyan-200">
-                  Applying filters...
-                </p>
-              </div>
+            {productsError ? (
+              <ErrorState 
+                title="Failed to Load Products" 
+                message={productsError} 
+                onRetry={() => getProducts(1)} 
+              />
+            ) : (isLoading || loadingProducts) && filterProduct.length === 0 ? (
+              <LoadingState type="card" count={8} message="Discovering amazing items for you..." />
             ) : filterProduct.length > 0 ? (
               <>
                 <p className="sr-only" role="status" aria-live="polite">
@@ -564,7 +485,7 @@ function Collections() {
                   role="list"
                   aria-label="Product results"
                 >
-                  {filterProduct.map((item, index) => (
+                  {filterProduct.map((item, _index) => (
                     <div
                       key={item._id}
                       className="collection-item"
@@ -599,23 +520,13 @@ function Collections() {
                 )}
               </>
             ) : (
-              <div className="text-center py-16 bg-white/80 dark:bg-gray-800/30 rounded-2xl border border-slate-200 dark:border-gray-700/40">
-                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-r from-slate-200 to-slate-300 dark:from-gray-800 dark:to-gray-900 rounded-full flex items-center justify-center">
-                  <FaSearch className="text-slate-500 dark:text-gray-600 text-3xl" />
-                </div>
-                <h3 className="text-slate-900 dark:text-white text-xl font-semibold mb-2">
-                  No products found
-                </h3>
-                <p className="text-slate-600 dark:text-gray-400 mb-6">
-                  Try adjusting your filters to find what you're looking for.
-                </p>
-                <button
-                  onClick={clearAllFilters}
-                  className="px-6 py-2.5 bg-cyan-500 hover:bg-cyan-600 text-white rounded-full transition-colors"
-                >
-                  Clear All Filters
-                </button>
-              </div>
+              <EmptyState
+                icon={FaSearch}
+                title="No products found"
+                description="Try adjusting your filters to find what you're looking for."
+                actionText="Clear All Filters"
+                onAction={clearAllFilters}
+              />
             )}
           </div>
         </div>

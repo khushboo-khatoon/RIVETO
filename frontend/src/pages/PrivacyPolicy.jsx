@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import Footer from '../components/Footer';
+import { useState, useEffect } from 'react';
 import {
-  FaShieldAlt,
-  FaUserShield,
-  FaLock,
-  FaCookie,
   FaDatabase,
+  FaUserShield,
+  FaCheckCircle,
   FaUserCog,
+  FaLock,
+  FaShieldAlt,
+  FaCookie,
   FaGavel,
+  FaExclamationCircle,
+  FaFile,
+  FaArrowRight,
   FaEnvelope,
   FaGithub,
-  FaArrowRight,
-  FaFile,
-  FaCheckCircle,
-  FaExclamationCircle,
 } from 'react-icons/fa';
+import Footer from '../components/Footer';
 
 const sections = [
   {
@@ -452,7 +452,7 @@ const Section = ({ section, isActive }) => (
   </section>
 );
 
-const PrivicyPolicy = () => {
+const PrivacyPolicy = () => {
   const [activeSection, setActiveSection] = useState('information-we-collect');
 
   useEffect(() => {
@@ -615,4 +615,4 @@ const PrivicyPolicy = () => {
   );
 };
 
-export default PrivicyPolicy;
+export default PrivacyPolicy;

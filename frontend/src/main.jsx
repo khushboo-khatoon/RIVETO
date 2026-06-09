@@ -1,23 +1,24 @@
 import { createRoot } from 'react-dom/client';
-import App from './App.jsx';
+import { BrowserRouter } from 'react-router-dom';
+import ThemeProvider from './context/ThemeContext';
+import AuthContext from './context/AuthContext';
+import UserContext from './context/UserContext';
+import NotificationProvider from './context/NotificationContext';
+import ShopContext from './context/ShopContext';
+import App from './App';
 import './index.css';
 import './styles/animations.css';
-import { BrowserRouter } from 'react-router-dom';
-import AuthContext from './context/AuthContext.jsx';
-import UserContext from './context/UserContext.jsx';
-import ShopContext from './context/ShopContext.jsx';
-import ThemeProvider from './context/ThemeContext.jsx'; // ⬅️ import
 
 createRoot(document.getElementById('root')).render(
   <BrowserRouter>
     <ThemeProvider>
-      {' '}
-      {/* ⬅️ wrap here */}
       <AuthContext>
         <UserContext>
-          <ShopContext>
-            <App />
-          </ShopContext>
+          <NotificationProvider>
+            <ShopContext>
+              <App />
+            </ShopContext>
+          </NotificationProvider>
         </UserContext>
       </AuthContext>
     </ThemeProvider>

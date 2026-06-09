@@ -1,25 +1,25 @@
-import React, { useContext, useState, useEffect } from 'react';
-import Title from '../components/Title';
-import CartTotal from '../components/CartTotal';
+import { useContext, useState, useEffect } from 'react';
 import { shopDataContext } from '../context/ShopContext';
-import { authDataContext } from '../context/AuthContext';
-import axios from 'axios';
+import apiConfig from '../utils/apiConfig';
 import { useNavigate } from 'react-router-dom';
-import {
-  FaMoneyBillWave,
-  FaMapMarkerAlt,
-  FaUser,
-  FaEnvelope,
-  FaPhone,
-  FaCity,
-  FaGlobe,
-  FaLock,
-  FaShippingFast,
-  FaCheckCircle,
-} from 'react-icons/fa';
-import { RiSecurePaymentLine, RiCoupon2Line } from 'react-icons/ri';
+import { FaMoneyBillWave } from 'react-icons/fa';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { userDataContext } from '../context/UserContext';
+import {
+  FaCheckCircle,
+  FaCity,
+  FaEnvelope,
+  FaGlobe,
+  FaLock,
+  FaMapMarkerAlt,
+  FaPhone,
+  FaShippingFast,
+  FaUser,
+} from 'react-icons/fa';
+import { RiSecurePaymentLine } from 'react-icons/ri';
+import Title from '../components/Title';
+import CartTotal from '../components/CartTotal';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -36,7 +36,7 @@ function PlaceOrder() {
     delivery_fee,
     product: products,
   } = useContext(shopDataContext);
-  const { serverUrl, userData } = useContext(authDataContext);
+  const { userData } = useContext(userDataContext);
 
   const [formData, setFormData] = useState({
     firstname: userData?.name?.split(' ')[0] || '',
@@ -139,16 +139,13 @@ function PlaceOrder() {
         status: 'Placed',
       };
 
-      const result = await axios.post(
-        `${serverUrl}/api/order/placeorder`,
-        orderData,
-        { withCredentials: true }
-      );
+      const result = await apiConfig.post('/order/placeorder', orderData);
       if (result.data) {
         setCartItem({});
         navigate('/order');
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error placing order:', error);
       setIsProcessing(false);
     }
