@@ -17,7 +17,8 @@ import {
   RefreshCw,
   Sparkles,
 } from 'lucide-react';
-import { FaInstagram, FaTwitter, FaFacebook } from 'react-icons/fa';
+import { FaInstagram, FaFacebook } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 
 // ─── Animation Variants ───────────────────────────────────────────────────────
 
@@ -1073,7 +1074,7 @@ function LandingPage() {
               <div className="mt-4 flex items-center gap-3">
                 {[
                   { Icon: FaInstagram, label: 'Instagram' },
-                  { Icon: FaTwitter, label: 'Twitter' },
+                  { Icon: FaXTwitter, label: 'X' },
                   { Icon: FaFacebook, label: 'Facebook' },
                 ].map(({ Icon, label }) => (
                   <a

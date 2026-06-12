@@ -3,7 +3,8 @@ import avatar from '../assets/avatar.jpg';
 // import { SiJavascript, SiReact, SiNodedotjs, SiPython, SiMongodb, SiPostgresql, SiAmazonaws, SiDocker } from 'react-icons/si';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { FaCloud, FaCode, FaDatabase, FaDownload, FaEnvelope, FaGithub, FaLinkedin, FaServer, FaTwitter } from 'react-icons/fa';
+import { FaCloud, FaCode, FaDatabase, FaDownload, FaEnvelope, FaGithub, FaLinkedin, FaServer } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -91,7 +92,7 @@ function ABOUTME() {
       color: 'hover:bg-blue-600',
     },
     {
-      icon: <FaTwitter className="w-5 h-5" />,
+      icon: <FaXTwitter className="w-5 h-5" />,
       label: 'Twitter',
       url: 'https://twitter.com/nishantborude',
       color: 'hover:bg-blue-400',
